@@ -1,0 +1,40 @@
+#Scatter with Karma as Size
+KarmaSize = table.plot.scatter(x='Attractiveness', y='Upvotes', s='Karma Score', figsize=(15,10), alpha=.2)
+KarmaSize.set_xlabel("Attractiveness of User", fontsize=16)
+KarmaSize.set_ylabel("Average Upvotes", fontsize=16)
+
+
+#Correlation
+mny = numpy.mean(file.Upvotes)
+mnx = numpy.mean(file.Attractiveness)
+r = numpy.sum((file.PercentCollegeGrad - mnx) * (file.Upvotes - mny)) / (numpy.sqrt(numpy.sum(numpy.square(file.Attractiveness - mnx))) * (numpy.sqrt(numpy.sum(numpy.square(file.Upvotes - mny)))))
+
+#Regression Parameters
+[A, V] = numpy.polyfit(file.Attractiveness, file.Upvotes, 1)
+Answer3 = (A, V)
+
+#Regression Error
+def Residuals(row):
+    return( row['Upvotes'] - ((A * row['Attractiveness']) + V))
+
+file['Error'] = file.apply(lambda row: Residuals(row), axis=1)
+
+#Regression & Error Plot
+file['Error'] = file['Error'].abs()
+sc = file.plot.scatter(x='Attractiveness', y='Upvotes', c='Error', colormap=plt.cm.cool, figsize=(15,10), alpha=.5)
+sc.set_xlabel("Attractiveness of User", fontsize=16)
+sc.set_ylabel("Average Upvotes", fontsize=16)
+sc.add_line(matplotlib.lines.Line2D([file['Attractiveness'].min(), file['Attractiveness'].max()], 
+                                    [A * file['Attractiveness'].min() + V, A * file['Attractiveness'].max() + V],
+                                    color='Red'))
+                                    
+                                    
+#Error exploration                                
+file['Error'] = file['Error'].abs()
+
+sc = file.plot.scatter(x='Attractiveness', y='Upvotes', c='Error', colormap=plt.cm.cool, figsize=(15,10), alpha=.5)
+sc.set_xlabel("Attractiveness of User", fontsize=16)
+sc.set_ylabel("Average Upvotes", fontsize=16)
+sc.add_line(matplotlib.lines.Line2D([file['Attractiveness'].min(), file['Attractiveness'].max()], 
+                                    [A * file['Attractiveness'].min() + V, A * file['Attractiveness'].max() + V],
+                                    color='Red'))
